@@ -1,13 +1,14 @@
 {
-  "name": "fast-geoip",
+  "name": "@darkdiesel/fast-geoip",
   "version": "1.1.88",
-  "description": "A faster & low-memory replacement for geoip-lite, a node library that maps IPs to geographical information",
+  "description": "A fork from a faster & low-memory replacement for geoip-lite, a node library that maps IPs to geographical information",
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "build": "tsc",
-    "generate": "python processGeoIpCsv.py",
+    "download": "python scripts/downloadDatabases.py",
+    "generate": "python scripts/processGeoIpCsv.py",
     "test": "node tests/lookup.test.js"
   },
   "keywords": [
@@ -17,21 +18,21 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/corollari/fast-geoip.git"
+    "url": "git+https://github.com/darkdiesel/fast-geoip.git"
   },
-  "author": "corollari",
+  "author": "darkdiesel",
   "license": "MIT",
   "files": [
     "data/*",
-    "build/index.js",
-    "build/index.d.ts",
-    "build/utils.js",
-    "build/params.js"
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/utils.js",
+    "dist/params.js"
   ],
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "devDependencies": {
-    "@types/node": "^14.0.20",
-    "typescript": "^3.9.6"
+    "@types/node": "^24.13.2",
+    "typescript": "^6.0.3"
   }
 }

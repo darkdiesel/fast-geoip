@@ -1,10 +1,6 @@
-# ⚠️ No Longer Maintained ⚠️
-
-This project is no longer actively maintained. Feel free to fork it or use it as a reference.
-
---- 
-
 # fast-geoip
+
+This project a fork from [onramper/fast-geoip](https://github.com/onramper/fast-geoip) node library
 
 > A faster & low-memory replacement for geoip-lite, a node library that maps IPs to geographical information
 

@@ -1,8 +1,16 @@
 __pycache__
 *.pyc
 raw
+geoip
 data
 node_modules
-build
+dist
 tests/mock_data/*.js
 npm-debug.log
+pnpm-lock.yaml
+
+# phpStorm Files
+.idea/
+
+# configs
+.env

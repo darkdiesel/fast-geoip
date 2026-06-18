@@ -6,29 +6,29 @@ on:
   pull_request:
   schedule:
   # * is a special character in YAML so you have to quote this string
-  - cron:  '0 0 * * *'
+  - cron:  '0 0 1 * *'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v2
       - name: Get Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '24.x'
       - run: npm ci
       - run: npm run build
 
   python-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        python-version: [3.8]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Test with unittest
@@ -37,15 +37,15 @@ jobs:
 
   js-test:
     needs: [build, python-test]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node: [ '0.12', '4', '6', '8', '10', '12', '14' ] # Major releases as described in https://nodejs.org/en/download/releases/
+        node: [ '16', '18', '20', '22', '24' ] # Major releases as described in https://nodejs.org/en/download/releases/
     name: Node ${{ matrix.node }} sample
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - run: npm install
@@ -54,41 +54,41 @@ jobs:
   publish:
     needs: [build, python-test, js-test]
     if: ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - run: npm ci 
+      - run: npm ci
       - name: Build typescript files
         run: npm run build
       - name: Download csv databases
-        run: python downloadDatabases.py
+        run: python scripts/downloadDatabases.py
         env:
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - name: Build data structures
         run: |
-          python processGeoIpCsv.py
+          python scripts/processGeoIpCsv.py
       - name: Get currently published data
         run: |
           mkdir old
           cd old
           npm init -y
-          npm install fast-geoip
+          npm install @darkdiesel/fast-geoip
       - name: Compare new and old data
         id: compare
         run: |
-          if ! diff -qrN ./data ./old/node_modules/fast-geoip/data; then
+          if ! diff -qrN ./data ./old/node_modules/darkdiesel-fast-geoip/data; then
             echo "::set-output name=changed::true"
             git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
             git config user.name "$GITHUB_ACTOR"
-            npm version patch 
+            npm version patch
           else
             echo "::set-output name=changed::false"
           fi

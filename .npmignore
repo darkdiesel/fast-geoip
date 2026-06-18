@@ -1,0 +1,9 @@
+# Windows thumbnails
+Thumbs.db
+.DS_Store
+
+# Sources
+src
+
+# Examples
+examples

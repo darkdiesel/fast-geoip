@@ -1,14 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2023",
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "types": ["node"],
     "strict": true,  
     "esModuleInterop": true,
-    "skipLibCheck": false, 
-    "outDir": "build",
+    "skipLibCheck": false,
+    "rootDir": "./src",
+    "outDir": "./dist",
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
     "declaration": true,
     "noUnusedParameters": true
   },
-  "exclude": ["node_modules", "build"]
+  "exclude": ["node_modules", "dist"]
 }

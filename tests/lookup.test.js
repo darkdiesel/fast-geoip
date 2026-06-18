@@ -3,12 +3,12 @@ const exec = require('child_process').execSync;
 
 // Setup
 process.chdir(__dirname + "/mock_data")
-exec("python ../../processGeoIpCsv.py") // Also generates build/params.js
+exec("python ../../scripts/processGeoIpCsv.py") // Also generates dist/params.ts
 exec("npm run build")
-exec("cp ../../build/index.js ../../build/utils.js build") // Files on the "files" field of package.json, the files that will be included in the package
+exec("cp ../../dist/index.js ../../dist/utils.js dist") // Files on the "files" field of package.json, the files that will be included in the package
 
-const lookup = require("./mock_data/build/index")
-const utils = require("./mock_data/build/utils")
+const lookup = require("./mock_data/dist/index")
+const utils = require("./mock_data/dist/utils")
 
 // ipStr2Num converts ips properly
 assert.strictEqual(utils.ipStr2Num("0.0.0.0"), 0)
@@ -30,7 +30,7 @@ function checkPromiseResult(object) {
 const promises = []
 
 // Normal IP
-const normalIp = lookup.lookup("1.2.3.4").then(checkPromiseResult({
+const normalIp = lookup.default.lookup("1.2.3.4").then(checkPromiseResult({
   range: [16909056, 16909312],
   country: 'RU',
   region: 'MOW',
@@ -49,7 +49,7 @@ const normalIp = lookup.lookup("1.2.3.4").then(checkPromiseResult({
 promises.push(normalIp)
 
 // Ip without location (and missing params)
-const missingLocationAndParams = lookup.lookup("23.161.144.1").then(
+const missingLocationAndParams = lookup.default.lookup("23.161.144.1").then(
   function (data) {
     // Country location data is used instead
     assert.strictEqual(data.country, "US")
@@ -61,15 +61,15 @@ const missingLocationAndParams = lookup.lookup("23.161.144.1").then(
 promises.push(missingLocationAndParams)
 
 // IP without location nor country
-const missingLocationAndCountry = lookup.lookup("80.231.5.0").then(checkPromiseResult(null))
+const missingLocationAndCountry = lookup.default.lookup("80.231.5.0").then(checkPromiseResult(null))
 promises.push(missingLocationAndCountry)
 
 // IP lower than any on the database -> not found -> returns null
-const lowIp = lookup.lookup("0.4.3.1").then(checkPromiseResult(null))
+const lowIp = lookup.default.lookup("0.4.3.1").then(checkPromiseResult(null))
 promises.push(lowIp)
 
 // IP higher than any on the database
-const highIp = lookup.lookup("250.1.2.3").then(
+const highIp = lookup.default.lookup("250.1.2.3").then(
   function (data) {
     // If there's no ip higher than the one queried, the high end of `range` should be set to the highest ip (the end of the whole IP range)
     assert.strictEqual(data.range[1], utils.ipStr2Num("255.255.255.255"))
@@ -92,7 +92,7 @@ function testRandomIps(numTests) {
   for (var i = 0; i < numTests; i++) {
     sequentialPromise = sequentialPromise.then(
       function () {
-        return lookup.lookup(getRandomIp())
+        return lookup.default.lookup(getRandomIp())
       })
   }
   promises.push(sequentialPromise)
@@ -103,10 +103,9 @@ testRandomIps(1e6)
 lookup.enableCache()
 testRandomIps(1e3)
 
-
 // Tear-down
 function tearDown() {
-  exec("rm -r data build")
+  exec("rm -r data dist")
 }
 
 Promise.all(promises).then(tearDown)

@@ -1,0 +1,4 @@
+module.exports = {
+    "LOCATION_RECORD_SIZE": 143,
+    "NUMBER_NODES_PER_MIDINDEX": 58
+}
